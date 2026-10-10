@@ -1,3 +1,12 @@
+proxy-groups:
+- name: 🇺🇸 美国节点
+  type: select
+  include-all-proxies: true
+- name: PROXY
+  type: select
+  proxies:
+  - 🇺🇸 美国节点
+  - DIRECT
 rules:
 - DOMAIN-SUFFIX,acl4.ssr,DIRECT
 - DOMAIN-SUFFIX,ip6-localhost,DIRECT

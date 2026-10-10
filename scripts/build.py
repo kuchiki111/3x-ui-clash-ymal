@@ -100,6 +100,31 @@ def build(config, fixtures=None, output=None):
             raise ValueError(f'{name}：内联模式只支持 classical 和 ipcidr')
         if type(spec.get('min_entries')) is not int or spec['min_entries'] < 1:
             raise ValueError(f'{name}：规则数量下限无效')
+    groups = policy.get('proxy-groups')
+    if not isinstance(groups, list) or not groups:
+        raise ValueError('策略配置必须包含 proxy-groups 列表')
+    group_names = set()
+    for group in groups:
+        if not isinstance(group, dict):
+            raise ValueError('策略组必须是 YAML 映射')
+        group_name = group.get('name')
+        if not isinstance(group_name, str) or not group_name.strip() or group_name in group_names:
+            raise ValueError(f'策略组名称无效或重复：{group_name!r}')
+        if group.get('type') != 'select':
+            raise ValueError(f'{group_name}：单节点配置只支持 select 策略组')
+        if 'include-all-proxies' in group and type(group['include-all-proxies']) is not bool:
+            raise ValueError(f'{group_name}：include-all-proxies 必须是布尔值')
+        group_names.add(group_name)
+    if 'PROXY' not in group_names:
+        raise ValueError('策略组必须包含 PROXY，以匹配现有路由规则')
+    for group in groups:
+        refs = group.get('proxies', [])
+        if not isinstance(refs, list) or any(
+            not isinstance(ref, str) or ref not in group_names | {'DIRECT'} for ref in refs
+        ):
+            raise ValueError(f'{group["name"]}：proxies 引用了未知策略组或节点')
+        if not refs and not group.get('include-all-proxies', False):
+            raise ValueError(f'{group["name"]}：需要 proxies 或 include-all-proxies')
     custom_rules = policy.get('custom_rules', [])
     policy_rules = policy.get('rules')
     if not isinstance(custom_rules, list) or not isinstance(policy_rules, list):
@@ -125,7 +150,7 @@ def build(config, fixtures=None, output=None):
         else:
             expanded.append(rule)
 
-    content = yaml.safe_dump({'rules': expanded}, allow_unicode=True, sort_keys=False)
+    content = yaml.safe_dump({'proxy-groups': groups, 'rules': expanded}, allow_unicode=True, sort_keys=False)
     if len(content.encode('utf-8')) > MAX_ROUTING_BYTES:
         raise ValueError('生成的路由文件超过 3X-UI 远程路由的 2 MiB 上限')
     destination = output or ROOT / 'dist/3x-ui.yaml'

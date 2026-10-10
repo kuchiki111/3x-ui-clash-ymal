@@ -8,6 +8,16 @@ providers:
   ProxyGFWlist: {behavior: classical, min_entries: 100}
   BanAD: {behavior: classical, min_entries: 10}
   BanProgramAD: {behavior: classical, min_entries: 10}
+# 3X-UI 会提供实际节点；策略组负责显示国旗并保持 PROXY 路由目标稳定。
+proxy-groups:
+  - name: "🇺🇸 美国节点"
+    type: select
+    include-all-proxies: true
+  - name: PROXY
+    type: select
+    proxies:
+      - "🇺🇸 美国节点"
+      - DIRECT
 # 企业专用规则应放在最前面，匹配顺序会影响结果。
 custom_rules: []
 rules:

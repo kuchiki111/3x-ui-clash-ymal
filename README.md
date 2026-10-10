@@ -1,6 +1,6 @@
 # 3X-UI 内联 ACL4SSR 路由规则
 
-这个项目定时读取 ACL4SSR 的规则数据，将每一条规则直接展开到 `dist/3x-ui.yaml`。生成文件只有 `rules` 列表，没有 `rule-providers`、规则文件链接、节点或用户密钥。路由顺序由 `config/policy.yaml` 决定，3X-UI 仍负责为每个订阅用户生成节点和 `PROXY` 分组。
+这个项目定时读取 ACL4SSR 的规则数据，将每一条规则直接展开到 `dist/3x-ui.yaml`。生成文件包含 `proxy-groups` 和 `rules`，没有 `rule-providers`、规则文件链接、节点或用户密钥。路由顺序由 `config/policy.yaml` 决定，实际节点仍由 3X-UI 为每个订阅用户生成。
 
 ## 使用
 
@@ -15,6 +15,15 @@
 生成内容示例：
 
 ```yaml
+proxy-groups:
+- name: 🇺🇸 美国节点
+  type: select
+  include-all-proxies: true
+- name: PROXY
+  type: select
+  proxies:
+  - 🇺🇸 美国节点
+  - DIRECT
 rules:
 - DOMAIN-SUFFIX,lan,DIRECT
 - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
@@ -27,18 +36,18 @@ rules:
 
 示例省略了中间上万条规则；完整内容见 `dist/3x-ui.yaml`。
 
-保存后刷新 Clash/Mihomo 订阅，确认订阅里既有用户节点，也有展开后的路由规则。不要把此文件作为独立的 Mihomo 配置导入；它不包含节点和代理分组。
+保存后刷新 Clash/Mihomo 订阅，确认订阅里有实际节点、`🇺🇸 美国节点` 和 `PROXY` 两个策略组，以及展开后的路由规则。`🇺🇸 美国节点` 会自动收录该订阅的全部节点；`PROXY` 是规则使用的稳定名称，可在其中选择美国节点组或 `DIRECT`。国旗只是策略组名称，不会识别节点所在地。如果以后加入其他地区节点，需要调整分组配置，避免把它们也标成美国节点。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
 
 ## 生成逻辑
 
-- `config/policy.yaml` 指定规则源、匹配顺序和目标策略。`RULE-SET` 条目只在构建阶段使用，生成文件中会替换成具体的 `DOMAIN-SUFFIX`、`IP-CIDR` 等规则。
+- `config/policy.yaml` 指定策略组、规则源、匹配顺序和目标策略。`RULE-SET` 条目只在构建阶段使用，生成文件中会替换成具体的 `DOMAIN-SUFFIX`、`IP-CIDR` 等规则。
 - 上游 `classical` 规则会保留 `no-resolve` 标记并插入目标策略；其中 `DOMAIN-SUFFIX,*.` 会改为 Mihomo 对应的 `DOMAIN-WILDCARD,*.`。`ipcidr` 列表会展开成 `IP-CIDR` 或 `IP-CIDR6` 规则。
 - 每次生成都会检查规则文件结构、最小条数、支持的规则类型以及最终文件大小。任何一步失败，工作流都不会提交这次产物，上次成功生成的文件继续保留。
 - 输出文件限制为 2 MiB，以适配 3X-UI 当前远程路由的大小上限。规则源目前只支持 `classical` 和 `ipcidr`。
 
 ## 修改策略
 
-在 `config/policy.yaml` 中调整 `providers` 和有序的 `rules` 列表，然后手动运行工作流。最后一条必须是 `MATCH,PROXY`。`custom_rules` 会放在所有上游规则之前。
+在 `config/policy.yaml` 中调整 `proxy-groups`、`providers` 和有序的 `rules` 列表，然后手动运行工作流。最后一条必须是 `MATCH,PROXY`。`custom_rules` 会放在所有上游规则之前。
 
 `custom_rules` 默认是空列表。例如需要让企业域名直连，可写入 `DOMAIN-SUFFIX,internal.example.com,DIRECT`。广告拦截规则可能误拦网站功能，可按需要删除 `BanAD`、`BanProgramAD` 对应的规则条目。
 
