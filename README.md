@@ -41,13 +41,13 @@ https://raw.githubusercontent.com/kuchiki111/3x-ui-clash-ymal/main/dist/3x-ui.ya
 策略组的关系如下：
 
 ```text
-ProxyGFWlist 命中 → PROXY → 节点选择 → 当前选中的节点或 DIRECT
+ProxyGFWlist 命中 → PROXY → 节点选择 → 当前选中的节点
 其他规则都未命中 → 兜底选择 → 节点选择或 DIRECT
 ```
 
-- 「节点选择」自动收录实际节点，也提供 `DIRECT`。首次加载默认选 `🇺🇸USA-LAX`；节点改名时须同步修改 `config/policy.yaml` 中的 `default-selected`，否则会回到列表首项 `DIRECT`。已保存的手动选择不会被初始值覆盖。
+- 「节点选择」自动收录实际节点，首次加载默认选收录列表中的第一项；无需写死节点名。节点按名称排序，不再将 `DIRECT` 放进这个组。已保存的手动选择不会被初始值覆盖。
 - `PROXY` 只是规则使用的中转组，固定指向「节点选择」。它标记为隐藏，但仍参与路由。
-- 「兜底选择」保持可见，可独立选「节点选择」或 `DIRECT`。选「节点选择」时，最终仍取决于该组当前选中的节点；若「节点选择」选了 `DIRECT`，经过它的流量也会直连。
+- 「兜底选择」保持可见，可独立选「节点选择」或 `DIRECT`。选「节点选择」时，最终仍取决于该组当前选中的节点。
 
 完整规则以 [生成文件](dist/3x-ui.yaml) 为准；规则源、顺序和策略组定义在 [策略文件](config/policy.yaml)。
 

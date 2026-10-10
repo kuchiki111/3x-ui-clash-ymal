@@ -13,10 +13,7 @@ proxy-groups:
   - name: 节点选择
     type: select
     include-all-proxies: true
-    # 节点名必须与 3X-UI 生成的名称完全一致；名称变化时需同步修改。
-    default-selected: "🇺🇸USA-LAX"
-    proxies:
-      - DIRECT
+    proxies: []
   - name: PROXY
     type: select
     hidden: true
