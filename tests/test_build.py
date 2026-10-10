@@ -46,6 +46,7 @@ class RuleTests(unittest.TestCase):
                 '  - name: 节点选择\n'
                 '    type: select\n'
                 '    include-all-proxies: true\n'
+                '    proxies: [DIRECT]\n'
                 '  - name: PROXY\n'
                 '    type: select\n'
                 '    proxies: [节点选择]\n'
@@ -63,7 +64,7 @@ class RuleTests(unittest.TestCase):
             self.assertEqual(
                 generated,
                 {'proxy-groups': [
-                    {'name': '节点选择', 'type': 'select', 'include-all-proxies': True},
+                    {'name': '节点选择', 'type': 'select', 'include-all-proxies': True, 'proxies': ['DIRECT']},
                     {'name': 'PROXY', 'type': 'select', 'proxies': ['节点选择']},
                 ], 'rules': [
                     'DOMAIN-SUFFIX,corp.example.com,DIRECT',

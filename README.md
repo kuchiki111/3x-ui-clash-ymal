@@ -19,6 +19,8 @@ proxy-groups:
 - name: 节点选择
   type: select
   include-all-proxies: true
+  proxies:
+  - DIRECT
 - name: PROXY
   type: select
   proxies:
@@ -35,7 +37,7 @@ rules:
 
 示例省略了中间上万条规则；完整内容见 `dist/3x-ui.yaml`。
 
-保存后刷新 Clash/Mihomo 订阅，确认订阅里有用户节点、`节点选择` 与 `PROXY` 两个策略组，以及展开后的路由规则。`节点选择` 自动收录该订阅的所有节点，可在客户端手动选择；`PROXY` 作为规则使用的固定名称，指向 `节点选择`。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
+保存后刷新 Clash/Mihomo 订阅，确认订阅里有用户节点、`节点选择` 与 `PROXY` 两个策略组，以及展开后的路由规则。`节点选择` 自动收录该订阅的所有节点，也提供 `DIRECT` 选项；`PROXY` 作为规则使用的固定名称，指向 `节点选择`。如果在「节点选择」中选中 `DIRECT`，命中 `PROXY` 的流量也会直连。首次刷新后请确认选中的是想使用的节点。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
 
 ## 生成逻辑
 

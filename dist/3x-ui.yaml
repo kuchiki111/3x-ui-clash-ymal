@@ -2,6 +2,8 @@ proxy-groups:
 - name: 节点选择
   type: select
   include-all-proxies: true
+  proxies:
+  - DIRECT
 - name: PROXY
   type: select
   proxies:
