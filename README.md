@@ -1,54 +1,55 @@
-# Company ACL4SSR Rules for 3X-UI
+# 3X-UI 内联 ACL4SSR 路由规则
 
-A scheduled, self-hosted snapshot of ACL4SSR rule **data**, published as a 3X-UI-compatible remote Clash/Mihomo routing YAML. Your strategies are fixed in `config/policy.yaml`; ACL4SSR updates only rule contents. No Xboard, Subconverter, Subgen or always-running server required.
+这个项目定时读取 ACL4SSR 的规则数据，将每一条规则直接展开到 `dist/3x-ui.yaml`。生成文件只有 `rules` 列表，没有 `rule-providers`、规则文件链接、节点或用户密钥。路由顺序由 `config/policy.yaml` 决定，3X-UI 仍负责为每个订阅用户生成节点和 `PROXY` 分组。
 
-## Setup (3 steps)
+## 使用
 
-1. Create a **public GitHub repository**, with the default branch named **`main`**, then upload *all files* in this project (including `.github/workflows/sync.yml`). A private repository cannot be used as a simple public GitHub Raw provider for end users.
-2. In GitHub go to **Actions → Sync ACL4SSR rule data → Run workflow**. Enable Actions write permissions as needed under **Settings → Actions → General → Workflow permissions → Read and write permissions**. Verify `dist/3x-ui.yaml` and `dist/rules/*.yaml` were committed.
-3. In **3X-UI → Panel Settings → Subscription → Clash/Mihomo**, enable routing and put ONLY this URL in **Global Routing Rules**:
+1. 将本仓库设为公开，并确认默认分支为 `main`。
+2. 确认仓库里已有 `dist/3x-ui.yaml`。需要立即更新时，在 GitHub Actions 中手动运行 **Sync ACL4SSR rule data**。此后工作流每天约北京时间 06:00 自动更新；GitHub 不保证定时任务精确准点执行。
+3. 在 **3X-UI → 面板设置 → 订阅 → Clash/Mihomo** 中启用路由，把下面的地址填入 **全局路由规则**：
 
-   `https://raw.githubusercontent.com/OWNER/REPO/main/dist/3x-ui.yaml`
+   `https://raw.githubusercontent.com/kuchiki111/3x-ui-clash-ymal/main/dist/3x-ui.yaml`
 
-   Replace OWNER/REPO with your public repository. Save, then refresh a Clash Verge Rev subscription and verify rules / rule-providers load successfully. Use the existing 3X-UI Clash subscription endpoint (not V2Ray Base64).
+这个地址仅用于让面板读取完整的 YAML 文件。文件内部的路由规则已经展开，不会再引用其他规则文件。也可以打开生成文件，将完整内容直接粘贴到支持内联 YAML 的 3X-UI 版本中；该文件包含上万条规则，使用远程文件通常更方便。
 
-## How it works
-
-- GitHub Actions runs daily at approximately **06:00 China Standard Time**, and manually through `workflow_dispatch`. Scheduled execution times are not guaranteed by GitHub.
-- `scripts/build.py` downloads ACL4SSR's **official `Clash/Providers/*.yaml`** sources, checks that each source is well-formed and nonempty, and publishes snapshots in your own `dist/rules/` directory.
-- `dist/3x-ui.yaml` references only **your GitHub raw URLs**, not ACL4SSR's URLs. Client rule-provider refresh is every 24 hours; the latest snapshot appears when the scheduled job commits. GitHub raw caches can delay availability.
-- The routing YAML deliberately contains only `rule-providers` and `rules`. It does **not** overwrite 3X-UI's automatically generated `PROXY` group or expose employees' VLESS UUIDs.
-- If any source fails validation, the workflow fails before the `git add/commit` step, preserving the last published version. This does not protect against all types of unwanted but syntactically valid upstream changes.
-- No external server is required. GitHub and its Raw domain remain a delivery dependency. Client-side cached providers may help during outages, but first-time setup will still require connectivity to your published URLs.
-
-## Customize
-
-Edit `config/policy.yaml` in GitHub and then press **Run workflow**. The `providers` list names official ACL4SSR YAML filenames. The ordered `rules` list uses standard Mihomo syntax. Keep `MATCH,PROXY` last. If a new provider is added, supply `behavior` and a sensible `min_entries`. The optional `custom_rules` block is prepended before ACL4SSR references. The example `corp.example.invalid` is deliberately inert; replace or remove it.
-
-Example corporate override:
+生成内容示例：
 
 ```yaml
-custom_rules:
-  - DOMAIN-SUFFIX,internal.example.com,DIRECT
+rules:
+- DOMAIN-SUFFIX,lan,DIRECT
+- IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+- DOMAIN-KEYWORD,admarvel,REJECT
+- DOMAIN-WILDCARD,*.pimg.tw,PROXY
+- IP-CIDR,1.0.1.0/24,DIRECT
+- GEOIP,CN,DIRECT
+- MATCH,PROXY
 ```
 
-If you need AI/Steam/Microsoft groups later, define groups deliberately and test 3X-UI's **remote YAML merge**. This base package intentionally uses the single panel-generated `PROXY` group; it does not blindly overwrite generated `proxy-groups`.
+示例省略了中间上万条规则；完整内容见 `dist/3x-ui.yaml`。
 
-## Run manually
+保存后刷新 Clash/Mihomo 订阅，确认订阅里既有用户节点，也有展开后的路由规则。不要把此文件作为独立的 Mihomo 配置导入；它不包含节点和代理分组。
+
+## 生成逻辑
+
+- `config/policy.yaml` 指定规则源、匹配顺序和目标策略。`RULE-SET` 条目只在构建阶段使用，生成文件中会替换成具体的 `DOMAIN-SUFFIX`、`IP-CIDR` 等规则。
+- 上游 `classical` 规则会保留 `no-resolve` 标记并插入目标策略；其中 `DOMAIN-SUFFIX,*.` 会改为 Mihomo 对应的 `DOMAIN-WILDCARD,*.`。`ipcidr` 列表会展开成 `IP-CIDR` 或 `IP-CIDR6` 规则。
+- 每次生成都会检查规则文件结构、最小条数、支持的规则类型以及最终文件大小。任何一步失败，工作流都不会提交这次产物，上次成功生成的文件继续保留。
+- 输出文件限制为 2 MiB，以适配 3X-UI 当前远程路由的大小上限。规则源目前只支持 `classical` 和 `ipcidr`。
+
+## 修改策略
+
+在 `config/policy.yaml` 中调整 `providers` 和有序的 `rules` 列表，然后手动运行工作流。最后一条必须是 `MATCH,PROXY`。`custom_rules` 会放在所有上游规则之前。
+
+`custom_rules` 默认是空列表。例如需要让企业域名直连，可写入 `DOMAIN-SUFFIX,internal.example.com,DIRECT`。广告拦截规则可能误拦网站功能，可按需要删除 `BanAD`、`BanProgramAD` 对应的规则条目。
+
+## 本地构建
 
 ```bash
-python -m pip install -r requirements.txt
-python scripts/build.py --repo YOUR_GITHUB_NAME/YOUR_REPO
+python3 -m pip install -r requirements.txt
+python3 scripts/build.py
+python3 -m unittest discover -s tests -v
 ```
 
-`build.py` requires internet access to GitHub Raw. Test it on a throwaway repository before attaching production users.
+本地构建需要能够访问 GitHub Raw。构建过程中只读取公开规则，不读取或写入用户订阅、UUID、令牌等敏感数据。
 
-## Security / operations
-
-- Never upload employee subscription URLs, UUIDs, tokens, or Xray API keys to the repository.
-- Treat upstream rules as trusted software configuration; review rule sources before enabling ad blocking (the included BanAD and BanProgramAD can block some legitimate services). Remove their provider and routing entries if undesirable.
-- Public GitHub serves rule data only; personal subscriptions continue to be generated by 3X-UI.
-- If GitHub Actions has write rights but cannot push due to repository rules/protected branches, use a dedicated publishing branch and modify the `main` URLs accordingly.
-- The publication is based on ACL4SSR's existing **provider files**, not ACL4SSR's full `.ini` converter template. Category selection, policy groups and matching order stay under your control.
-
-Sources: https://github.com/ACL4SSR/ACL4SSR and https://github.com/MHSanaei/3x-ui/issues/6363
+上游规则来源：[ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)。

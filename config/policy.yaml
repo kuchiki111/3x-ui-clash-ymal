@@ -1,6 +1,5 @@
 # 只需修改此文件即可调整企业路由策略。
-# ACL4SSR 规则内容会自动更新；下面的规则列表和顺序由你决定。
-interval: 86400
+# ACL4SSR 规则内容会自动展开；下面的规则列表和顺序由你决定。
 providers:
   LocalAreaNetwork: {behavior: classical, min_entries: 5}
   UnBan: {behavior: classical, min_entries: 1}
@@ -10,8 +9,7 @@ providers:
   BanAD: {behavior: classical, min_entries: 10}
   BanProgramAD: {behavior: classical, min_entries: 10}
 # 企业专用规则应放在最前面，匹配顺序会影响结果。
-custom_rules:
-  - DOMAIN-SUFFIX,corp.example.invalid,DIRECT
+custom_rules: []
 rules:
   - RULE-SET,LocalAreaNetwork,DIRECT
   - RULE-SET,UnBan,DIRECT
