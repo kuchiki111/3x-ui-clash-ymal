@@ -46,7 +46,12 @@ class RuleTests(unittest.TestCase):
                 '  - name: 节点选择\n'
                 '    type: select\n'
                 '    include-all-proxies: true\n'
-                '    proxies: [DIRECT]\n'
+                '    default-selected: 默认节点\n'
+                '    proxies: [默认节点, DIRECT]\n'
+                '  - name: 默认节点\n'
+                '    type: select\n'
+                '    hidden: true\n'
+                '    include-all-proxies: true\n'
                 '  - name: PROXY\n'
                 '    type: select\n'
                 '    hidden: true\n'
@@ -68,7 +73,8 @@ class RuleTests(unittest.TestCase):
             self.assertEqual(
                 generated,
                 {'proxy-groups': [
-                    {'name': '节点选择', 'type': 'select', 'include-all-proxies': True, 'proxies': ['DIRECT']},
+                    {'name': '节点选择', 'type': 'select', 'include-all-proxies': True, 'default-selected': '默认节点', 'proxies': ['默认节点', 'DIRECT']},
+                    {'name': '默认节点', 'type': 'select', 'hidden': True, 'include-all-proxies': True},
                     {'name': 'PROXY', 'type': 'select', 'hidden': True, 'proxies': ['节点选择']},
                     {'name': '兜底选择', 'type': 'select', 'proxies': ['节点选择', 'DIRECT']},
                 ], 'rules': [

@@ -13,8 +13,15 @@ proxy-groups:
   - name: 节点选择
     type: select
     include-all-proxies: true
+    default-selected: 默认节点
     proxies:
+      - 默认节点
       - DIRECT
+  # 用动态收录的第一个节点作为初始出口，同时保留手动选择节点和直连。
+  - name: 默认节点
+    type: select
+    hidden: true
+    include-all-proxies: true
   - name: PROXY
     type: select
     hidden: true
