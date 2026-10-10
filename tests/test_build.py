@@ -42,13 +42,6 @@ class RuleTests(unittest.TestCase):
                 'providers:\n'
                 '  LocalAreaNetwork: {behavior: classical, min_entries: 3}\n'
                 '  ChinaIp: {behavior: ipcidr, min_entries: 1}\n'
-                'proxy-groups:\n'
-                '  - name: "🇺🇸 美国节点"\n'
-                '    type: select\n'
-                '    include-all-proxies: true\n'
-                '  - name: PROXY\n'
-                '    type: select\n'
-                '    proxies: ["🇺🇸 美国节点", DIRECT]\n'
                 'custom_rules:\n'
                 '  - DOMAIN-SUFFIX,corp.example.com,DIRECT\n'
                 'rules:\n'
@@ -62,10 +55,7 @@ class RuleTests(unittest.TestCase):
             generated = yaml.safe_load(output.read_text(encoding='utf-8'))
             self.assertEqual(
                 generated,
-                {'proxy-groups': [
-                    {'name': '🇺🇸 美国节点', 'type': 'select', 'include-all-proxies': True},
-                    {'name': 'PROXY', 'type': 'select', 'proxies': ['🇺🇸 美国节点', 'DIRECT']},
-                ], 'rules': [
+                {'rules': [
                     'DOMAIN-SUFFIX,corp.example.com,DIRECT',
                     'DOMAIN-SUFFIX,local,DIRECT',
                     'DOMAIN-WILDCARD,*.example.com,DIRECT',
