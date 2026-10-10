@@ -6,10 +6,12 @@ proxy-groups:
   - DIRECT
 - name: PROXY
   type: select
+  hidden: true
   proxies:
   - 节点选择
 - name: 兜底选择
   type: select
+  hidden: true
   proxies:
   - 节点选择
   - DIRECT

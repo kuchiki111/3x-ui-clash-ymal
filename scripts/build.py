@@ -114,6 +114,8 @@ def build(config, fixtures=None, output=None):
             raise ValueError(f'{group_name}：当前配置只支持 select 策略组')
         if 'include-all-proxies' in group and type(group['include-all-proxies']) is not bool:
             raise ValueError(f'{group_name}：include-all-proxies 必须是布尔值')
+        if 'hidden' in group and type(group['hidden']) is not bool:
+            raise ValueError(f'{group_name}：hidden 必须是布尔值')
         group_names.add(group_name)
     for group in groups:
         refs = group.get('proxies', [])

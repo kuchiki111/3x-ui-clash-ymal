@@ -23,10 +23,12 @@ proxy-groups:
   - DIRECT
 - name: PROXY
   type: select
+  hidden: true
   proxies:
   - 节点选择
 - name: 兜底选择
   type: select
+  hidden: true
   proxies:
   - 节点选择
   - DIRECT
@@ -42,7 +44,7 @@ rules:
 
 示例省略了中间上万条规则；完整内容见 `dist/3x-ui.yaml`。
 
-保存后刷新 Clash/Mihomo 订阅，确认订阅里有用户节点、`节点选择`、`PROXY` 和 `兜底选择` 三个策略组，以及展开后的路由规则。`节点选择` 自动收录该订阅的所有节点，也提供 `DIRECT` 选项；`PROXY` 指向 `节点选择`，用于命中 `ProxyGFWlist` 的流量。最后的 `MATCH` 规则指向 `兜底选择`，可独立选「节点选择」或 `DIRECT`。如果在「节点选择」中选中 `DIRECT`，通过它转发的流量也会直连。首次刷新后请确认两个手动选择组中的选项。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
+保存后刷新 Clash/Mihomo 订阅，确认订阅里有用户节点、`节点选择`、`PROXY` 和 `兜底选择` 三个策略组，以及展开后的路由规则。`节点选择` 自动收录该订阅的所有节点，也提供 `DIRECT` 选项；`PROXY` 指向 `节点选择`，用于命中 `ProxyGFWlist` 的流量。最后的 `MATCH` 规则指向 `兜底选择`，其默认选项为「节点选择」。`PROXY` 和 `兜底选择` 标记为隐藏，在支持 `hidden` 的 Clash Verge Rev 界面中不显示，但仍参与路由。隐藏「兜底选择」后无法在界面直接切换它；如需独立切换兜底出口，可删除该组的 `hidden: true`。如果在「节点选择」中选中 `DIRECT`，通过它转发的流量也会直连。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
 
 ## 生成逻辑
 
