@@ -51,8 +51,8 @@ def validate_rule_line(line, names):
         raise ValueError(f'无效的路由规则：{line!r}')
     kind = parts[0]
     if kind == 'MATCH':
-        if parts != ['MATCH', 'PROXY']:
-            raise ValueError('兜底规则必须是 MATCH,PROXY')
+        if len(parts) != 2:
+            raise ValueError(f'无效的兜底规则：{line}')
     elif kind == 'RULE-SET':
         if len(parts) != 3 or parts[1] not in names:
             raise ValueError(f'未知或无效的规则集引用：{line}')
@@ -115,8 +115,6 @@ def build(config, fixtures=None, output=None):
         if 'include-all-proxies' in group and type(group['include-all-proxies']) is not bool:
             raise ValueError(f'{group_name}：include-all-proxies 必须是布尔值')
         group_names.add(group_name)
-    if 'PROXY' not in group_names:
-        raise ValueError('策略组必须包含 PROXY，以匹配现有路由规则')
     for group in groups:
         refs = group.get('proxies', [])
         if not isinstance(refs, list) or any(
@@ -130,12 +128,17 @@ def build(config, fixtures=None, output=None):
     if not isinstance(custom_rules, list) or not isinstance(policy_rules, list):
         raise ValueError('custom_rules 和 rules 必须是列表')
     source_rules = custom_rules + policy_rules
-    if not source_rules or source_rules[-1] != 'MATCH,PROXY':
-        raise ValueError('最后一条规则必须是 MATCH,PROXY')
+    if not source_rules or not isinstance(source_rules[-1], str) or not source_rules[-1].startswith('MATCH,'):
+        raise ValueError('最后一条规则必须是 MATCH 兜底规则')
+    allowed_targets = group_names | {'DIRECT', 'REJECT'}
     for index, rule in enumerate(source_rules):
         validate_rule_line(rule, providers)
-        if rule == 'MATCH,PROXY' and index != len(source_rules) - 1:
-            raise ValueError('MATCH,PROXY 只能出现在末尾')
+        parts = rule.split(',')
+        if parts[0] == 'MATCH' and index != len(source_rules) - 1:
+            raise ValueError('MATCH 兜底规则只能出现在末尾')
+        target = parts[-2] if parts[-1] == 'no-resolve' else parts[-1]
+        if target not in allowed_targets:
+            raise ValueError(f'路由规则引用了未知策略组：{target}')
 
     snapshots = {name: read_rule(name, spec, fixtures) for name, spec in providers.items()}
     expanded = []

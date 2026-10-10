@@ -25,6 +25,11 @@ proxy-groups:
   type: select
   proxies:
   - 节点选择
+- name: 兜底选择
+  type: select
+  proxies:
+  - 节点选择
+  - DIRECT
 rules:
 - DOMAIN-SUFFIX,lan,DIRECT
 - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
@@ -32,12 +37,12 @@ rules:
 - DOMAIN-WILDCARD,*.pimg.tw,PROXY
 - IP-CIDR,1.0.1.0/24,DIRECT
 - GEOIP,CN,DIRECT
-- MATCH,PROXY
+- MATCH,兜底选择
 ```
 
 示例省略了中间上万条规则；完整内容见 `dist/3x-ui.yaml`。
 
-保存后刷新 Clash/Mihomo 订阅，确认订阅里有用户节点、`节点选择` 与 `PROXY` 两个策略组，以及展开后的路由规则。`节点选择` 自动收录该订阅的所有节点，也提供 `DIRECT` 选项；`PROXY` 作为规则使用的固定名称，指向 `节点选择`。如果在「节点选择」中选中 `DIRECT`，命中 `PROXY` 的流量也会直连。首次刷新后请确认选中的是想使用的节点。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
+保存后刷新 Clash/Mihomo 订阅，确认订阅里有用户节点、`节点选择`、`PROXY` 和 `兜底选择` 三个策略组，以及展开后的路由规则。`节点选择` 自动收录该订阅的所有节点，也提供 `DIRECT` 选项；`PROXY` 指向 `节点选择`，用于命中 `ProxyGFWlist` 的流量。最后的 `MATCH` 规则指向 `兜底选择`，可独立选「节点选择」或 `DIRECT`。如果在「节点选择」中选中 `DIRECT`，通过它转发的流量也会直连。首次刷新后请确认两个手动选择组中的选项。此文件不包含实际节点，不能单独作为完整的 Mihomo 配置导入。
 
 ## 生成逻辑
 
@@ -48,7 +53,7 @@ rules:
 
 ## 修改策略
 
-在 `config/policy.yaml` 中调整 `proxy-groups`、`providers` 和有序的 `rules` 列表，然后手动运行工作流。最后一条必须是 `MATCH,PROXY`。`custom_rules` 会放在所有上游规则之前。
+在 `config/policy.yaml` 中调整 `proxy-groups`、`providers` 和有序的 `rules` 列表，然后手动运行工作流。最后一条必须是 `MATCH` 兜底规则，当前目标为 `兜底选择`。`custom_rules` 会放在所有上游规则之前。
 
 `custom_rules` 默认是空列表。例如需要让企业域名直连，可写入 `DOMAIN-SUFFIX,internal.example.com,DIRECT`。广告拦截规则可能误拦网站功能，可按需要删除 `BanAD`、`BanProgramAD` 对应的规则条目。
 

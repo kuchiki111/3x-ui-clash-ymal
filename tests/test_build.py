@@ -50,12 +50,15 @@ class RuleTests(unittest.TestCase):
                 '  - name: PROXY\n'
                 '    type: select\n'
                 '    proxies: [节点选择]\n'
+                '  - name: 兜底选择\n'
+                '    type: select\n'
+                '    proxies: [节点选择, DIRECT]\n'
                 'custom_rules:\n'
                 '  - DOMAIN-SUFFIX,corp.example.com,DIRECT\n'
                 'rules:\n'
                 '  - RULE-SET,LocalAreaNetwork,DIRECT\n'
                 '  - RULE-SET,ChinaIp,DIRECT\n'
-                '  - MATCH,PROXY\n',
+                '  - MATCH,兜底选择\n',
                 encoding='utf-8',
             )
             output = root / 'dist/3x-ui.yaml'
@@ -66,13 +69,14 @@ class RuleTests(unittest.TestCase):
                 {'proxy-groups': [
                     {'name': '节点选择', 'type': 'select', 'include-all-proxies': True, 'proxies': ['DIRECT']},
                     {'name': 'PROXY', 'type': 'select', 'proxies': ['节点选择']},
+                    {'name': '兜底选择', 'type': 'select', 'proxies': ['节点选择', 'DIRECT']},
                 ], 'rules': [
                     'DOMAIN-SUFFIX,corp.example.com,DIRECT',
                     'DOMAIN-SUFFIX,local,DIRECT',
                     'DOMAIN-WILDCARD,*.example.com,DIRECT',
                     'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve',
                     'IP-CIDR,1.0.1.0/24,DIRECT',
-                    'MATCH,PROXY',
+                    'MATCH,兜底选择',
                 ]},
             )
 
