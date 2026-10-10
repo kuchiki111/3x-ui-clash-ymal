@@ -53,7 +53,6 @@ class RuleTests(unittest.TestCase):
                 '    proxies: [节点选择]\n'
                 '  - name: 兜底选择\n'
                 '    type: select\n'
-                '    hidden: true\n'
                 '    proxies: [节点选择, DIRECT]\n'
                 'custom_rules:\n'
                 '  - DOMAIN-SUFFIX,corp.example.com,DIRECT\n'
@@ -71,7 +70,7 @@ class RuleTests(unittest.TestCase):
                 {'proxy-groups': [
                     {'name': '节点选择', 'type': 'select', 'include-all-proxies': True, 'proxies': ['DIRECT']},
                     {'name': 'PROXY', 'type': 'select', 'hidden': True, 'proxies': ['节点选择']},
-                    {'name': '兜底选择', 'type': 'select', 'hidden': True, 'proxies': ['节点选择', 'DIRECT']},
+                    {'name': '兜底选择', 'type': 'select', 'proxies': ['节点选择', 'DIRECT']},
                 ], 'rules': [
                     'DOMAIN-SUFFIX,corp.example.com,DIRECT',
                     'DOMAIN-SUFFIX,local,DIRECT',
