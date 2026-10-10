@@ -11,8 +11,8 @@ proxy-groups:
 - name: 兜底选择
   type: select
   proxies:
-  - 节点选择
   - DIRECT
+  - 节点选择
 rules:
 - DOMAIN-SUFFIX,acl4.ssr,DIRECT
 - DOMAIN-SUFFIX,ip6-localhost,DIRECT

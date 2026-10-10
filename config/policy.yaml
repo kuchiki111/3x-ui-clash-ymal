@@ -22,8 +22,8 @@ proxy-groups:
   - name: 兜底选择
     type: select
     proxies:
-      - 节点选择
       - DIRECT
+      - 节点选择
 # 企业专用规则应放在最前面，匹配顺序会影响结果。
 custom_rules: []
 rules:
