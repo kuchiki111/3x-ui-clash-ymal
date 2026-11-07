@@ -4097,7 +4097,6 @@ rules:
 - DOMAIN-SUFFIX,matters.town,PROXY
 - DOMAIN-SUFFIX,matthewdgreen.wordpress.com,PROXY
 - DOMAIN-SUFFIX,mattwilcox.net,PROXY
-- DOMAIN-SUFFIX,maven.neoforged.net,PROXY
 - DOMAIN-SUFFIX,mcadforums.com,PROXY
 - DOMAIN-SUFFIX,mcaf.ee,PROXY
 - DOMAIN-SUFFIX,mceindex.com,PROXY
@@ -4307,6 +4306,7 @@ rules:
 - DOMAIN-SUFFIX,nekoslovakia.net,PROXY
 - DOMAIN-SUFFIX,neo-miracle.com,PROXY
 - DOMAIN-SUFFIX,neodb.social,PROXY
+- DOMAIN-SUFFIX,neoforged.net,PROXY
 - DOMAIN-SUFFIX,neowin.net,PROXY
 - DOMAIN-SUFFIX,nephobox.com,PROXY
 - DOMAIN-SUFFIX,netalert.me,PROXY
