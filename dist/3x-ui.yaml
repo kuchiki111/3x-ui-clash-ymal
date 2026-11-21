@@ -2734,6 +2734,7 @@ rules:
 - DOMAIN-SUFFIX,dtiblog.com,PROXY
 - DOMAIN-SUFFIX,dtic.mil,PROXY
 - DOMAIN-SUFFIX,dubox.com,PROXY
+- DOMAIN-SUFFIX,duck.ai,PROXY
 - DOMAIN-SUFFIX,duck.com,PROXY
 - DOMAIN-SUFFIX,duckduckgo.com,PROXY
 - DOMAIN-SUFFIX,duckmylife.com,PROXY
@@ -3085,9 +3086,9 @@ rules:
 - DOMAIN-SUFFIX,gabocorp.com,PROXY
 - DOMAIN-SUFFIX,gagaoolala.com,PROXY
 - DOMAIN-SUFFIX,galenwu.com,PROXY
-- DOMAIN-SUFFIX,game735.com,PROXY
 - DOMAIN-SUFFIX,gamer.com.tw,PROXY
 - DOMAIN-SUFFIX,gamez.com.tw,PROXY
+- DOMAIN-SUFFIX,gamma.app,PROXY
 - DOMAIN-SUFFIX,ganjing.com,PROXY
 - DOMAIN-SUFFIX,ganjingworld.com,PROXY
 - DOMAIN-SUFFIX,gaoming.net,PROXY
@@ -5047,6 +5048,7 @@ rules:
 - DOMAIN-SUFFIX,sotwe.com,PROXY
 - DOMAIN-SUFFIX,soubory.com,PROXY
 - DOMAIN-SUFFIX,soulcaliburhentai.net,PROXY
+- DOMAIN-SUFFIX,soulogic.com,PROXY
 - DOMAIN-SUFFIX,soundcloud.com,PROXY
 - DOMAIN-SUFFIX,soundofhope.org,PROXY
 - DOMAIN-SUFFIX,soundon.fm,PROXY
